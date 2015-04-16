@@ -1,4 +1,4 @@
-(defproject com.taoensso/carmine "2.9.2"
+(defproject mavbozo/carmine "2.9.2"
   :author "Peter Taoussanis <https://www.taoensso.com>"
   :description "Clojure Redis client & message queue"
   :url "https://github.com/ptaoussanis/carmine"
@@ -17,7 +17,10 @@
    [com.taoensso/nippy               "2.8.0"]
    [org.apache.commons/commons-pool2 "2.3"]
    [commons-codec/commons-codec      "1.10"]
-   [org.clojure/data.json            "0.2.6"]]
+   [org.clojure/data.json            "0.2.6"]
+   [com.kohlschutter.junixsocket/junixsocket-native-common "2.0.4"]
+   [com.kohlschutter.junixsocket/junixsocket-native "2.0.4" :extension "nar"]
+   [com.kohlschutter.junixsocket/junixsocket-common "2.0.4"]]
 
   :profiles
   {;; :default [:base :system :user :provided :dev]

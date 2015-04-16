@@ -5,7 +5,8 @@
   (:require [taoensso.encore           :as encore]
             [taoensso.carmine.protocol :as protocol])
   (:import  [java.net InetSocketAddress Socket URI]
-            [java.io BufferedInputStream DataInputStream BufferedOutputStream]
+            [org.newsclub.net.unix AFUNIXSocket AFUNIXServerSocket AFUNIXSocketAddress AFUNIXSocketException]
+            [java.io File BufferedInputStream DataInputStream BufferedOutputStream]
             [org.apache.commons.pool2 KeyedPooledObjectFactory]
             [org.apache.commons.pool2.impl GenericKeyedObjectPool DefaultPooledObject]))
 
@@ -62,13 +63,17 @@
         conn-timeout-ms (get spec :conn-timeout-ms (or timeout-ms 4000))
         read-timeout-ms (get spec :read-timeout-ms     timeout-ms)
 
-        socket-address (InetSocketAddress. ^String host ^Integer port)
-        socket (encore/doto-cond [expr (Socket.)]
-                 :always         (.setTcpNoDelay   true)
-                 :always         (.setKeepAlive    true)
-                 :always         (.setReuseAddress true)
-                 ;; :always      (.setSoLinger     true 0)
-                 read-timeout-ms (.setSoTimeout ^Integer expr))
+        socket-address (if (= port 0)
+                         (AFUNIXSocketAddress. (File. ^String host))
+                         (InetSocketAddress. ^String host ^Integer port))
+        socket (if (= port 0)
+                 (AFUNIXSocket/newInstance)
+                 (encore/doto-cond [expr (Socket.)]
+                                   :always         (.setTcpNoDelay   true)
+                                   :always         (.setKeepAlive    true)
+                                   :always         (.setReuseAddress true)
+                                   ;; :always      (.setSoLinger     true 0)
+                                   read-timeout-ms (.setSoTimeout ^Integer expr)))
         _ (if conn-timeout-ms
             (.connect socket socket-address conn-timeout-ms)
             (.connect socket socket-address))
